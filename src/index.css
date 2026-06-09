@@ -1,60 +1,197 @@
+@import "tailwindcss";
+
+/* ── Light theme (secondary) ───────────────────────────── */
 :root {
-    /*--text: #6b6375;
-    --text-h: #08060d;
-    --bg: #fff;
-    --border: #e5e4e7;
-    --code-bg: #f4f3ec;
-    --accent: #aa3bff;
-    --accent-bg: rgba(170, 59, 255, 0.1);
-    --accent-border: rgba(170, 59, 255, 0.5);
-    --social-bg: rgba(244, 243, 236, 0.5);
-    --shadow:
-        rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;*/
-    /*
-    --sans: system-ui, "Segoe UI", Roboto, sans-serif;
-    --heading: system-ui, "Segoe UI", Roboto, sans-serif;
-    --mono: ui-monospace, Consolas, monospace;*/
+    --background: #fafafa;
+    --background-elevated: #ffffff;
+    --foreground: #18181b;
+    --surface: #ffffff;
+    --surface-hover: #f4f4f5;
+    --surface-active: #e4e4e7;
+    --border: #e4e4e7;
+    --border-strong: #d4d4d8;
+    --border-hover: #a1a1aa;
+    --muted: #52525b;
+    --muted-subtle: #71717a;
+    --faint: #a1a1aa;
 
-    /*font: 18px/145% var(--sans);
-    letter-spacing: 0.18px;
-    color-scheme: light dark;
-    color: var(--text);
-    background: var(--bg);
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    --accent: #0891b2;
+    --accent-hover: #0e7490;
+    --accent-foreground: #ecfeff;
+    --accent-soft: rgba(8, 145, 178, 0.1);
 
-    @media (max-width: 1024px) {
-        font-size: 16px;
-    }*/
+    --running: #059669;
+    --running-soft: rgba(5, 150, 105, 0.12);
+    --warning: #d97706;
+    --warning-soft: rgba(217, 119, 6, 0.12);
+    --danger: #dc2626;
+    --danger-soft: rgba(220, 38, 38, 0.12);
+    --paused: #6b7280;
+
+    --selection: rgba(8, 145, 178, 0.14);
+    --shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        /*--text: #9ca3af;
-        --text-h: #f3f4f6;
-        --bg: #16171d;
-        --border: #2e303a;
-        --code-bg: #1f2028;
-        --accent: #c084fc;
-        --accent-bg: rgba(192, 132, 252, 0.15);
-        --accent-border: rgba(192, 132, 252, 0.5);
-        --social-bg: rgba(47, 48, 58, 0.5);
-        --shadow:
-            rgba(0, 0, 0, 0.4) 0 10px 15px -3px,
-            rgba(0, 0, 0, 0.25) 0 4px 6px -2px;*/
+/* ── Dark theme (primary, default) ─────────────────────── */
+:root[data-theme="dark"] {
+    --background: #09090b;
+    --background-elevated: #0c0c0f;
+    --foreground: #e4e4e7;
+    --surface: #131316;
+    --surface-hover: #1c1c20;
+    --surface-active: #27272a;
+    --border: #232328;
+    --border-strong: #2e2e34;
+    --border-hover: #3f3f46;
+    --muted: #a1a1aa;
+    --muted-subtle: #71717a;
+    --faint: #52525b;
+
+    --accent: #22d3ee;
+    --accent-hover: #67e8f9;
+    --accent-foreground: #06181d;
+    --accent-soft: rgba(34, 211, 238, 0.1);
+
+    --running: #34d399;
+    --running-soft: rgba(52, 211, 153, 0.12);
+    --warning: #fbbf24;
+    --warning-soft: rgba(251, 191, 36, 0.12);
+    --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.12);
+    --paused: #71717a;
+
+    --selection: rgba(34, 211, 238, 0.12);
+    --shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-background-elevated: var(--background-elevated);
+    --color-foreground: var(--foreground);
+    --color-surface: var(--surface);
+    --color-surface-hover: var(--surface-hover);
+    --color-surface-active: var(--surface-active);
+    --color-border: var(--border);
+    --color-border-strong: var(--border-strong);
+    --color-border-hover: var(--border-hover);
+    --color-muted: var(--muted);
+    --color-muted-subtle: var(--muted-subtle);
+    --color-faint: var(--faint);
+
+    --color-accent: var(--accent);
+    --color-accent-hover: var(--accent-hover);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent-soft: var(--accent-soft);
+
+    --color-running: var(--running);
+    --color-running-soft: var(--running-soft);
+    --color-warning: var(--warning);
+    --color-warning-soft: var(--warning-soft);
+    --color-danger: var(--danger);
+    --color-danger-soft: var(--danger-soft);
+    --color-paused: var(--paused);
+
+    --font-mono:
+        "JetBrains Mono", "SF Mono", "Cascadia Code", "Menlo", ui-monospace,
+        monospace;
+    --font-sans:
+        "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* {
+    border-color: var(--border);
+}
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+}
+
+::selection {
+    background: var(--selection);
+}
+
+/* Compact, terminal-flavored scrollbars */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--border-hover);
+    background-clip: padding-box;
+    border: 2px solid transparent;
+}
+
+@layer utilities {
+    .tabular {
+        font-variant-numeric: tabular-nums;
     }
 }
 
-#root {
-    /*width: 1126px;
-    max-width: 100%;
-    margin: 0 auto;
-    text-align: center;
-    border-inline: 1px solid var(--border);
-    min-height: 100svh;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;*/
+/* Animations are gated behind .anim so Low mode can disable them */
+.anim * {
+    transition-property: background-color, border-color, color, opacity,
+        transform, box-shadow;
+    transition-duration: 120ms;
+    transition-timing-function: ease-out;
+}
+
+@keyframes vx-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+@keyframes vx-pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.97) translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+.anim .vx-fade-in {
+    animation: vx-fade-in 120ms ease-out;
+}
+.anim .vx-pop-in {
+    animation: vx-pop-in 130ms ease-out;
+}
+
+@keyframes vx-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.35;
+    }
+}
+.anim .vx-pulse {
+    animation: vx-pulse 1.8s ease-in-out infinite;
 }
