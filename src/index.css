@@ -152,8 +152,8 @@ body {
 
 /* Animations are gated behind .anim so Low mode can disable them */
 .anim * {
-    transition-property: background-color, border-color, color, opacity,
-        transform, box-shadow;
+    transition-property:
+        background-color, border-color, color, opacity, transform, box-shadow;
     transition-duration: 120ms;
     transition-timing-function: ease-out;
 }

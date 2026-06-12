@@ -5,7 +5,7 @@ import { formatMb, formatPercent } from "../lib/format";
 import { StatusDot } from "./primitives";
 import { ModeToggle } from "./ModeToggle";
 import { cpuColor, memColor } from "./status";
-import { IconPlug } from "./icons";
+import { Plug as IconPlug } from "lucide-react";
 
 function Sep() {
   return <span className="h-3.5 w-px bg-border" aria-hidden />;
@@ -19,7 +19,14 @@ export function TopStatusBar() {
     <header className="flex h-9 shrink-0 items-center gap-3 border-b border-border bg-background-elevated px-3 text-[12px]">
       {/* Brand */}
       <div className="flex items-center gap-2 pr-1">
-        <Logo />
+        <img
+          src="/favicon.svg"
+          alt=""
+          width={16}
+          height={16}
+          className="h-4 w-4 shrink-0"
+          aria-hidden
+        />
         <span className="font-semibold tracking-tight text-foreground">
           Vesselix
         </span>
@@ -47,8 +54,7 @@ export function TopStatusBar() {
           {host.dockerConnected ? "Docker connected" : "Disconnected"}
         </span>
         <span className="flex items-center gap-1 text-faint">
-          <IconPlug width={11} height={11} />
-          v{host.engineVersion}
+          <IconPlug width={11} height={11} />v{host.engineVersion}
         </span>
       </span>
 
@@ -115,31 +121,5 @@ function HostMetric({
       </span>
       {sub && <span className="text-faint">{sub}</span>}
     </span>
-  );
-}
-
-function Logo() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
-      <path
-        d="M3 9h18l-2 9a2 2 0 0 1-2 1.6H7A2 2 0 0 1 5 18z"
-        fill="var(--accent)"
-        opacity="0.18"
-      />
-      <path
-        d="M3 9h18l-2 9a2 2 0 0 1-2 1.6H7A2 2 0 0 1 5 18z"
-        fill="none"
-        stroke="var(--accent)"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M8 9V6.5A1.5 1.5 0 0 1 9.5 5h5A1.5 1.5 0 0 1 16 6.5V9"
-        fill="none"
-        stroke="var(--accent)"
-        strokeWidth="1.6"
-      />
-      <path d="M12 12v4" stroke="var(--accent)" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
   );
 }

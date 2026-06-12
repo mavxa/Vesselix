@@ -9,18 +9,41 @@ import { StatsPanel } from "./StatsPanel";
 import { InspectPanel } from "./InspectPanel";
 import { ActionsPanel } from "./ActionsPanel";
 import {
-  IconBolt,
-  IconChevronDown,
-  IconInspect,
-  IconLogs,
-  IconStats,
-} from "./icons";
+  Activity,
+  ChevronDown,
+  ScanSearch,
+  Logs,
+  ChartColumn,
+} from "lucide-react";
 
-const TABS: { key: DetailTab; label: string; icon: React.ReactNode; hint?: string }[] = [
-  { key: "logs", label: "Logs", icon: <IconLogs width={13} height={13} />, hint: "l" },
-  { key: "stats", label: "Stats", icon: <IconStats width={13} height={13} /> },
-  { key: "inspect", label: "Inspect", icon: <IconInspect width={13} height={13} />, hint: "i" },
-  { key: "actions", label: "Actions", icon: <IconBolt width={13} height={13} /> },
+const TABS: {
+  key: DetailTab;
+  label: string;
+  icon: React.ReactNode;
+  hint?: string;
+}[] = [
+  {
+    key: "logs",
+    label: "Logs",
+    icon: <Logs size={14} strokeWidth={1} />,
+    hint: "l",
+  },
+  {
+    key: "stats",
+    label: "Stats",
+    icon: <ChartColumn size={14} strokeWidth={1} />,
+  },
+  {
+    key: "inspect",
+    label: "Inspect",
+    icon: <ScanSearch size={14} strokeWidth={1} />,
+    hint: "i",
+  },
+  {
+    key: "actions",
+    label: "Actions",
+    icon: <Activity size={14} strokeWidth={1} />,
+  },
 ];
 
 export function ContainerDetailPanel() {
@@ -30,7 +53,7 @@ export function ContainerDetailPanel() {
   if (!c) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-muted-subtle">
-        <IconInspect width={22} height={22} className="text-faint" />
+        <ScanSearch size={14} strokeWidth={1} className="text-faint" />
         <p className="text-[12px]">No container selected</p>
         <p className="text-[11px] text-faint">
           Select a row, or use <Kbd>j</Kbd> <Kbd>k</Kbd> to navigate
@@ -57,7 +80,9 @@ export function ContainerDetailPanel() {
             {health.label}
           </Badge>
         )}
-        <span className="font-mono text-[11px] text-faint">{shortId(c.id)}</span>
+        <span className="font-mono text-[11px] text-faint">
+          {shortId(c.id)}
+        </span>
 
         <button
           type="button"
@@ -65,7 +90,7 @@ export function ContainerDetailPanel() {
           className="ml-auto flex h-6 items-center gap-1 rounded px-1.5 text-[11px] text-muted-subtle hover:bg-surface-active hover:text-foreground"
           title="Collapse panel"
         >
-          <IconChevronDown width={13} height={13} />
+          <ChevronDown size={14} strokeWidth={1} />
           Hide
         </button>
       </div>
@@ -81,14 +106,14 @@ export function ContainerDetailPanel() {
               onClick={() => s.setDetailTab(t.key)}
               className={cn(
                 "relative flex h-full items-center gap-1.5 px-2.5 text-[12px] font-medium",
-                active ? "text-foreground" : "text-muted-subtle hover:text-muted",
+                active
+                  ? "text-foreground"
+                  : "text-muted-subtle hover:text-muted",
               )}
             >
               {t.icon}
               {t.label}
-              {t.hint && (
-                <Kbd className="ml-0.5 opacity-60">{t.hint}</Kbd>
-              )}
+              {t.hint && <Kbd className="ml-0.5 opacity-60">{t.hint}</Kbd>}
               {active && (
                 <span className="absolute inset-x-1.5 -bottom-px h-0.5 rounded-full bg-accent" />
               )}

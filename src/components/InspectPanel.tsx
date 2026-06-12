@@ -20,7 +20,9 @@ export function InspectPanel({ container: c }: Props) {
         <Field label="Created" value={formatAge(c.createdAt) + " ago"} />
         <Field
           label="Started"
-          value={c.state === "running" ? formatUptime(c.startedAt) + " ago" : "—"}
+          value={
+            c.state === "running" ? formatUptime(c.startedAt) + " ago" : "—"
+          }
         />
         <Field label="Restart policy" mono value={c.restartPolicy} />
         <Field label="PIDs" value={String(c.pids)} />
@@ -32,7 +34,10 @@ export function InspectPanel({ container: c }: Props) {
         ) : (
           <div className="col-span-2 flex flex-col gap-1">
             {c.ports.map((p, i) => (
-              <div key={i} className="flex items-center gap-2 font-mono text-[11px]">
+              <div
+                key={i}
+                className="flex items-center gap-2 font-mono text-[11px]"
+              >
                 <span className="text-accent">
                   {p.hostIp ?? "0.0.0.0"}:{p.publicPort ?? "—"}
                 </span>
@@ -55,14 +60,19 @@ export function InspectPanel({ container: c }: Props) {
               <div key={i} className="font-mono text-[11px] leading-tight">
                 <span
                   className="mr-1.5 rounded px-1 py-px text-[10px]"
-                  style={{ background: "var(--surface-active)", color: "var(--muted-subtle)" }}
+                  style={{
+                    background: "var(--surface-active)",
+                    color: "var(--muted-subtle)",
+                  }}
                 >
                   {m.type}
                 </span>
                 <span className="text-muted">{m.source}</span>
                 <span className="text-faint"> → </span>
                 <span className="text-foreground">{m.destination}</span>
-                <span className={cn("ml-1.5", m.rw ? "text-warning" : "text-faint")}>
+                <span
+                  className={cn("ml-1.5", m.rw ? "text-warning" : "text-faint")}
+                >
                   {m.rw ? "rw" : "ro"}
                 </span>
               </div>
@@ -116,13 +126,21 @@ export function InspectPanel({ container: c }: Props) {
   );
 }
 
-function Group({ title, children }: { title: string; children: React.ReactNode }) {
+function Group({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="mb-2 rounded-md border border-border bg-surface">
       <div className="border-b border-border px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">
         {title}
       </div>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 px-2.5 py-2">{children}</div>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 px-2.5 py-2">
+        {children}
+      </div>
     </section>
   );
 }
@@ -140,7 +158,9 @@ function Field({
 }) {
   return (
     <div className={cn("flex flex-col gap-0.5", full && "col-span-2")}>
-      <span className="text-[10px] uppercase tracking-wide text-faint">{label}</span>
+      <span className="text-[10px] uppercase tracking-wide text-faint">
+        {label}
+      </span>
       <span
         className={cn(
           "break-all text-foreground",

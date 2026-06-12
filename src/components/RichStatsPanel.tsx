@@ -99,7 +99,10 @@ function ChartCard({
     <div className="rounded-md border border-border bg-surface">
       <div className="flex items-center justify-between border-b border-border px-2.5 py-1.5">
         <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">
-          <span className="h-2 w-2 rounded-full" style={{ background: color }} />
+          <span
+            className="h-2 w-2 rounded-full"
+            style={{ background: color }}
+          />
           {title}
         </span>
         <div className="flex items-center gap-3 text-[11px] tabular">
@@ -114,7 +117,13 @@ function ChartCard({
         </div>
       </div>
       <div className="px-1 pb-1 pt-2">
-        <CanvasChart data={data} color={color} max={max} unit={unit} height={96} />
+        <CanvasChart
+          data={data}
+          color={color}
+          max={max}
+          unit={unit}
+          height={96}
+        />
       </div>
     </div>
   );

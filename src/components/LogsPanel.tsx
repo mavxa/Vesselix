@@ -13,14 +13,7 @@ import { formatTimestampMs } from "../lib/format";
 import { logLevelColor } from "./status";
 import { cn } from "../lib/cn";
 import { Kbd } from "./primitives";
-import {
-  IconClose,
-  IconCopy,
-  IconPause,
-  IconPlay,
-  IconSearch,
-  IconTrash,
-} from "./icons";
+import { CircleOff, Copy, Pause, Play, ScanSearch, Trash } from "lucide-react";
 
 const LINE_HEIGHT = 19;
 const TAIL_LIMITS = [100, 500, 1000] as const;
@@ -58,7 +51,9 @@ export function LogsPanel({ container, mode }: Props) {
 
   // Trim when limit shrinks.
   useEffect(() => {
-    setLines((prev) => (prev.length > limit ? prev.slice(prev.length - limit) : prev));
+    setLines((prev) =>
+      prev.length > limit ? prev.slice(prev.length - limit) : prev,
+    );
   }, [limit]);
 
   // Live tail. Interval depends on mode (slower in Low).
@@ -136,7 +131,11 @@ export function LogsPanel({ container, mode }: Props) {
           )}
           title={paused ? "Resume tail" : "Pause tail"}
         >
-          {paused ? <IconPlay width={11} height={11} /> : <IconPause width={11} height={11} />}
+          {paused ? (
+            <Play size={11} strokeWidth={1} />
+          ) : (
+            <Pause size={11} strokeWidth={1} />
+          )}
           {paused ? "Paused" : "Live"}
         </button>
 
@@ -159,7 +158,11 @@ export function LogsPanel({ container, mode }: Props) {
 
         {/* Search inside logs */}
         <div className="relative flex w-48 items-center">
-          <IconSearch width={12} height={12} className="pointer-events-none absolute left-2 text-faint" />
+          <ScanSearch
+            size={14}
+            strokeWidth={1}
+            className="pointer-events-none absolute left-2 text-faint"
+          />
           <input
             ref={searchRef}
             value={search}
@@ -174,7 +177,7 @@ export function LogsPanel({ container, mode }: Props) {
               onClick={() => setSearch("")}
               className="absolute right-1.5 text-faint hover:text-muted"
             >
-              <IconClose width={11} height={11} />
+              <CircleOff size={14} strokeWidth={1} />
             </button>
           )}
         </div>
@@ -219,7 +222,7 @@ export function LogsPanel({ container, mode }: Props) {
             className="flex h-6 w-6 items-center justify-center rounded border border-border bg-surface text-muted hover:text-foreground"
             title="Copy visible lines"
           >
-            <IconCopy width={12} height={12} />
+            <Copy size={14} strokeWidth={1} />
           </button>
           <button
             type="button"
@@ -227,7 +230,7 @@ export function LogsPanel({ container, mode }: Props) {
             className="flex h-6 w-6 items-center justify-center rounded border border-border bg-surface text-muted hover:text-danger"
             title="Clear view"
           >
-            <IconTrash width={12} height={12} />
+            <Trash size={14} strokeWidth={1} />
           </button>
         </div>
       </div>
@@ -240,10 +243,17 @@ export function LogsPanel({ container, mode }: Props) {
       >
         {filtered.length === 0 ? (
           <div className="flex h-full items-center justify-center text-faint">
-            {lines.length === 0 ? "No log output." : "No lines match the filter."}
+            {lines.length === 0
+              ? "No log output."
+              : "No lines match the filter."}
           </div>
         ) : (
-          <div style={{ height: rowVirtualizer.getTotalSize(), position: "relative" }}>
+          <div
+            style={{
+              height: rowVirtualizer.getTotalSize(),
+              position: "relative",
+            }}
+          >
             {items.map((vi) => {
               const line = filtered[vi.index];
               return (
@@ -263,7 +273,9 @@ export function LogsPanel({ container, mode }: Props) {
       {/* Logs status footer */}
       <div className="flex h-6 shrink-0 items-center gap-3 border-t border-border bg-background px-2.5 text-[10px] text-faint">
         <span className="tabular">{filtered.length} lines</span>
-        {search && <span className="tabular">filtered from {lines.length}</span>}
+        {search && (
+          <span className="tabular">filtered from {lines.length}</span>
+        )}
         <span className="ml-auto flex items-center gap-1">
           press <Kbd>/</Kbd> in table to search containers
         </span>
@@ -295,7 +307,9 @@ function LogRow({
       style={{
         top,
         minHeight: LINE_HEIGHT,
-        background: isProblem ? `color-mix(in srgb, ${levelColor} 7%, transparent)` : undefined,
+        background: isProblem
+          ? `color-mix(in srgb, ${levelColor} 7%, transparent)`
+          : undefined,
       }}
     >
       <span className="shrink-0 select-none text-faint tabular">
@@ -314,7 +328,11 @@ function LogRow({
         )}
         style={isProblem ? { color: levelColor } : undefined}
       >
-        {highlight ? <Highlighted text={line.text} term={highlight} /> : line.text}
+        {highlight ? (
+          <Highlighted text={line.text} term={highlight} />
+        ) : (
+          line.text
+        )}
       </span>
     </div>
   );

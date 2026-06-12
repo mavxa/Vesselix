@@ -56,11 +56,17 @@ export function Badge({
   );
 }
 
-export function Kbd({ children, className }: { children: ReactNode; className?: string }) {
+export function Kbd({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <kbd
       className={cn(
-        "inline-flex h-[18px] min-w-[18px] items-center justify-center rounded border border-border-strong bg-surface px-1 font-mono text-[10px] font-medium text-muted-subtle",
+        "inline-flex h-4.5 min-w-4.5 items-center justify-center rounded border border-border-strong bg-surface px-1 font-mono text-[10px] font-medium text-muted-subtle",
         className,
       )}
     >
@@ -84,7 +90,10 @@ export function MeterBar({
   const pct = Math.max(0, Math.min(1, ratio)) * 100;
   return (
     <div
-      className={cn("w-full overflow-hidden rounded-full bg-surface-active", className)}
+      className={cn(
+        "w-full overflow-hidden rounded-full bg-surface-active",
+        className,
+      )}
       style={{ height }}
     >
       <div

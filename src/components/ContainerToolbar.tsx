@@ -3,12 +3,12 @@ import type { ContainerFilter, SortKey } from "../lib/types";
 import { cn } from "../lib/cn";
 import { Kbd } from "./primitives";
 import {
-  IconChevronDown,
-  IconChevronUp,
-  IconCommand,
-  IconRefresh,
-  IconSearch,
-} from "./icons";
+  ChevronDown as IconChevronDown,
+  ChevronUp as IconChevronUp,
+  Command as IconCommand,
+  RefreshCw as IconRefresh,
+  Search as IconSearch,
+} from "lucide-react";
 
 const FILTERS: { key: ContainerFilter; label: string }[] = [
   { key: "all", label: "All" },

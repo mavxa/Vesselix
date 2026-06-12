@@ -1,6 +1,6 @@
 import { useAppState } from "../store/appContext";
 import { cn } from "../lib/cn";
-import { IconBolt, IconLeaf } from "./icons";
+import { Gpu, Leaf } from "lucide-react";
 
 /**
  * Low / High performance mode segmented toggle.
@@ -20,7 +20,10 @@ export function ModeToggle() {
             "inline-block h-1.5 w-1.5 rounded-full",
             mode === "high" && "vx-pulse",
           )}
-          style={{ background: mode === "high" ? "var(--accent)" : "var(--muted-subtle)" }}
+          style={{
+            background:
+              mode === "high" ? "var(--accent)" : "var(--muted-subtle)",
+          }}
         />
         {mode === "high" ? "1s" : "4s"}
       </span>
@@ -41,7 +44,11 @@ export function ModeToggle() {
               : "text-muted-subtle hover:text-muted",
           )}
         >
-          <IconLeaf width={12} height={12} style={{ color: mode === "low" ? "var(--running)" : undefined }} />
+          <Leaf
+            size={14}
+            strokeWidth={1}
+            style={{ color: mode === "low" ? "var(--running)" : undefined }}
+          />
           Low
         </button>
         <button
@@ -56,7 +63,11 @@ export function ModeToggle() {
               : "text-muted-subtle hover:text-muted",
           )}
         >
-          <IconBolt width={12} height={12} style={{ color: mode === "high" ? "var(--accent)" : undefined }} />
+          <Gpu
+            size={14}
+            strokeWidth={1}
+            style={{ color: mode === "high" ? "var(--accent)" : undefined }}
+          />
           High
         </button>
       </div>

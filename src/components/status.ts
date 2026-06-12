@@ -15,25 +15,60 @@ export interface StatusTone {
 export function stateTone(state: ContainerState): StatusTone {
   switch (state) {
     case "running":
-      return { label: "running", color: "var(--running)", soft: "var(--running-soft)", dot: "running" };
+      return {
+        label: "running",
+        color: "var(--running)",
+        soft: "var(--running-soft)",
+        dot: "running",
+      };
     case "restarting":
-      return { label: "restarting", color: "var(--warning)", soft: "var(--warning-soft)", dot: "warning" };
+      return {
+        label: "restarting",
+        color: "var(--warning)",
+        soft: "var(--warning-soft)",
+        dot: "warning",
+      };
     case "paused":
-      return { label: "paused", color: "var(--paused)", soft: "rgba(113,113,122,0.14)", dot: "paused" };
+      return {
+        label: "paused",
+        color: "var(--paused)",
+        soft: "rgba(113,113,122,0.14)",
+        dot: "paused",
+      };
     case "exited":
     default:
-      return { label: "exited", color: "var(--danger)", soft: "var(--danger-soft)", dot: "danger" };
+      return {
+        label: "exited",
+        color: "var(--danger)",
+        soft: "var(--danger-soft)",
+        dot: "danger",
+      };
   }
 }
 
 export function healthTone(health: ContainerHealth): StatusTone | null {
   switch (health) {
     case "healthy":
-      return { label: "healthy", color: "var(--running)", soft: "var(--running-soft)", dot: "running" };
+      return {
+        label: "healthy",
+        color: "var(--running)",
+        soft: "var(--running-soft)",
+        dot: "running",
+      };
     case "unhealthy":
-      return { label: "unhealthy", color: "var(--danger)", soft: "var(--danger-soft)", dot: "danger" };
+      return {
+        label: "unhealthy",
+        color: "var(--danger)",
+        soft: "var(--danger-soft)",
+        dot: "danger",
+      };
     case "starting":
-      return { label: "starting", color: "var(--warning)", soft: "var(--warning-soft)", dot: "warning" };
+      return {
+        label: "starting",
+        color: "var(--warning)",
+        soft: "var(--warning-soft)",
+        dot: "warning",
+      };
     case "none":
     default:
       return null;

@@ -23,7 +23,8 @@ export function LowStatsPanel({ container: c }: Props) {
   const running = c.state === "running";
 
   const cpuValues = c.cpuHistory;
-  const cpuAvg = cpuValues.reduce((a, b) => a + b, 0) / Math.max(1, cpuValues.length);
+  const cpuAvg =
+    cpuValues.reduce((a, b) => a + b, 0) / Math.max(1, cpuValues.length);
   const cpuMax = Math.max(...cpuValues, 0);
   const memRatio = c.memoryLimitMb > 0 ? c.memoryUsageMb / c.memoryLimitMb : 0;
 
@@ -40,9 +41,20 @@ export function LowStatsPanel({ container: c }: Props) {
       <Section
         title="CPU"
         accent={cpuColor(c.cpuPercent)}
-        spark={<Sparkline data={cpuValues} color={cpuColor(c.cpuPercent)} width={120} height={28} fill />}
+        spark={
+          <Sparkline
+            data={cpuValues}
+            color={cpuColor(c.cpuPercent)}
+            width={120}
+            height={28}
+            fill
+          />
+        }
       >
-        <Metric label="current" value={running ? formatPercent(c.cpuPercent) : "—"} />
+        <Metric
+          label="current"
+          value={running ? formatPercent(c.cpuPercent) : "—"}
+        />
         <Metric label="average" value={running ? formatPercent(cpuAvg) : "—"} />
         <Metric label="max" value={running ? formatPercent(cpuMax) : "—"} />
         <Metric label="pids" value={running ? String(c.pids) : "—"} />
@@ -63,9 +75,15 @@ export function LowStatsPanel({ container: c }: Props) {
           />
         }
       >
-        <Metric label="used" value={running ? formatMb(c.memoryUsageMb) : "—"} />
+        <Metric
+          label="used"
+          value={running ? formatMb(c.memoryUsageMb) : "—"}
+        />
         <Metric label="limit" value={formatMb(c.memoryLimitMb)} />
-        <Metric label="usage" value={running ? formatPercent(memRatio * 100, 0) : "—"} />
+        <Metric
+          label="usage"
+          value={running ? formatPercent(memRatio * 100, 0) : "—"}
+        />
         <div className="col-span-4 mt-1">
           <MeterBar
             ratio={memRatio}
@@ -77,8 +95,14 @@ export function LowStatsPanel({ container: c }: Props) {
 
       {/* Network */}
       <Section title="Network">
-        <Metric label="rx rate" value={running ? formatRate(c.networkRxRate) : "—"} />
-        <Metric label="tx rate" value={running ? formatRate(c.networkTxRate) : "—"} />
+        <Metric
+          label="rx rate"
+          value={running ? formatRate(c.networkRxRate) : "—"}
+        />
+        <Metric
+          label="tx rate"
+          value={running ? formatRate(c.networkTxRate) : "—"}
+        />
         <Metric label="rx total" value={formatBytes(c.networkRxBytes)} />
         <Metric label="tx total" value={formatBytes(c.networkTxBytes)} />
       </Section>
@@ -108,13 +132,18 @@ function Section({
       <div className="flex items-center justify-between border-b border-border px-2.5 py-1.5">
         <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">
           {accent && (
-            <span className="h-2 w-2 rounded-full" style={{ background: accent }} />
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ background: accent }}
+            />
           )}
           {title}
         </span>
         {spark}
       </div>
-      <div className="grid grid-cols-4 gap-x-3 gap-y-1.5 px-2.5 py-2">{children}</div>
+      <div className="grid grid-cols-4 gap-x-3 gap-y-1.5 px-2.5 py-2">
+        {children}
+      </div>
     </div>
   );
 }
@@ -122,8 +151,12 @@ function Section({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col">
-      <span className="text-[10px] uppercase tracking-wide text-faint">{label}</span>
-      <span className="tabular text-[13px] font-medium text-foreground">{value}</span>
+      <span className="text-[10px] uppercase tracking-wide text-faint">
+        {label}
+      </span>
+      <span className="tabular text-[13px] font-medium text-foreground">
+        {value}
+      </span>
     </div>
   );
 }

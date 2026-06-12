@@ -1,6 +1,6 @@
 import { useAppState } from "../store/appContext";
 import { cn } from "../lib/cn";
-import { IconClose } from "./icons";
+import { X as IconClose } from "lucide-react";
 
 const toneColor = {
   info: "var(--accent)",

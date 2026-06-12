@@ -4,7 +4,10 @@ import type { SortKey } from "../lib/types";
 import { cn } from "../lib/cn";
 import { TABLE_GRID } from "./tableLayout";
 import { ContainerRow } from "./ContainerRow";
-import { IconChevronDown, IconChevronUp } from "./icons";
+import {
+  ChevronDown as IconChevronDown,
+  ChevronUp as IconChevronUp,
+} from "lucide-react";
 
 interface HeaderCell {
   label: string;

@@ -5,17 +5,17 @@ import { Kbd } from "./primitives";
 import { stateTone } from "./status";
 import { StatusDot } from "./primitives";
 import {
-  IconBolt,
-  IconInspect,
-  IconLeaf,
-  IconLogs,
-  IconPlay,
-  IconRefresh,
-  IconRestart,
-  IconSearch,
-  IconStats,
-  IconStop,
-} from "./icons";
+  Activity,
+  Bug,
+  Leaf,
+  Logs,
+  Play,
+  RefreshCcw,
+  RotateCcw,
+  ScanSearch,
+  ChartColumn,
+  CircleOff,
+} from "lucide-react";
 
 interface Command {
   id: string;
@@ -58,7 +58,7 @@ function PaletteInner() {
         id: "restart",
         title: `Restart container${selName}`,
         group: "Container",
-        icon: <IconRestart width={14} height={14} />,
+        icon: <RotateCcw size={14} strokeWidth={1} />,
         hint: "r",
         disabled: !hasSel || sel?.state !== "running",
         run: close(() => sel && s.runAction("restart", sel)),
@@ -67,7 +67,7 @@ function PaletteInner() {
         id: "stop",
         title: `Stop container${selName}`,
         group: "Container",
-        icon: <IconStop width={12} height={12} />,
+        icon: <CircleOff size={14} strokeWidth={1} />,
         hint: "s",
         disabled: !hasSel || sel?.state !== "running",
         run: close(() => sel && s.runAction("stop", sel)),
@@ -76,7 +76,7 @@ function PaletteInner() {
         id: "start",
         title: `Start container${selName}`,
         group: "Container",
-        icon: <IconPlay width={12} height={12} />,
+        icon: <Play size={14} strokeWidth={1} />,
         disabled: !hasSel || sel?.state === "running",
         run: close(() => sel && s.runAction("start", sel)),
       },
@@ -84,7 +84,7 @@ function PaletteInner() {
         id: "logs",
         title: "Open logs",
         group: "View",
-        icon: <IconLogs width={14} height={14} />,
+        icon: <Logs size={14} strokeWidth={1} />,
         hint: "l",
         disabled: !hasSel,
         run: close(() => {
@@ -96,7 +96,7 @@ function PaletteInner() {
         id: "stats",
         title: "Open stats",
         group: "View",
-        icon: <IconStats width={14} height={14} />,
+        icon: <ChartColumn size={14} strokeWidth={1} />,
         disabled: !hasSel,
         run: close(() => {
           s.setDetailTab("stats");
@@ -107,7 +107,7 @@ function PaletteInner() {
         id: "inspect",
         title: "Inspect container",
         group: "View",
-        icon: <IconInspect width={14} height={14} />,
+        icon: <Bug size={14} strokeWidth={1} />,
         hint: "i",
         disabled: !hasSel,
         run: close(() => {
@@ -150,7 +150,7 @@ function PaletteInner() {
         id: "mode-low",
         title: "Toggle Low mode",
         group: "Mode",
-        icon: <IconLeaf width={14} height={14} />,
+        icon: <Leaf size={14} strokeWidth={1} />,
         keywords: "performance lightweight",
         run: close(() => s.setMode("low")),
       },
@@ -158,7 +158,7 @@ function PaletteInner() {
         id: "mode-high",
         title: "Toggle High mode",
         group: "Mode",
-        icon: <IconBolt width={14} height={14} />,
+        icon: <Activity size={14} strokeWidth={1} />,
         keywords: "performance charts rich",
         run: close(() => s.setMode("high")),
       },
@@ -166,7 +166,7 @@ function PaletteInner() {
         id: "refresh",
         title: "Refresh containers",
         group: "App",
-        icon: <IconRefresh width={14} height={14} />,
+        icon: <RefreshCcw size={14} strokeWidth={1} />,
         run: close(() => s.refresh()),
       },
     ];
@@ -176,7 +176,9 @@ function PaletteInner() {
     const q = query.trim().toLowerCase();
     if (!q) return commands;
     return commands.filter((c) =>
-      (c.title + " " + c.group + " " + (c.keywords ?? "")).toLowerCase().includes(q),
+      (c.title + " " + c.group + " " + (c.keywords ?? ""))
+        .toLowerCase()
+        .includes(q),
     );
   }, [commands, query]);
 
@@ -232,7 +234,7 @@ function PaletteInner() {
       >
         {/* Input */}
         <div className="flex items-center gap-2 border-b border-border px-3">
-          <IconSearch width={15} height={15} className="text-faint" />
+          <ScanSearch size={40} strokeWidth={1} className="text-faint" />
           <input
             ref={inputRef}
             value={query}
@@ -309,7 +311,9 @@ function renderGrouped(
         onClick={() => !cmd.disabled && cmd.run()}
         className={cn(
           "flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-[12.5px] disabled:opacity-35",
-          isActive && !cmd.disabled ? "bg-accent-soft" : "hover:bg-surface-hover",
+          isActive && !cmd.disabled
+            ? "bg-accent-soft"
+            : "hover:bg-surface-hover",
         )}
       >
         <span
@@ -330,5 +334,7 @@ function renderGrouped(
 }
 
 function FilterDot({ color }: { color: string }) {
-  return <span className="h-2.5 w-2.5 rounded-full" style={{ background: color }} />;
+  return (
+    <span className="h-2.5 w-2.5 rounded-full" style={{ background: color }} />
+  );
 }

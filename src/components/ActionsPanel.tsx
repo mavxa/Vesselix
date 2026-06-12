@@ -3,14 +3,14 @@ import type { Container } from "../lib/types";
 import { useAppState, type ContainerAction } from "../store/appContext";
 import { cn } from "../lib/cn";
 import {
-  IconKill,
-  IconPause,
-  IconPlay,
-  IconRestart,
-  IconStop,
-  IconTrash,
-  IconWarning,
-} from "./icons";
+  X,
+  Pause,
+  Play,
+  RotateCcw,
+  CircleOff,
+  Trash,
+  FileExclamationPoint,
+} from "lucide-react";
 
 interface Props {
   container: Container;
@@ -31,7 +31,7 @@ const ACTIONS: ActionDef[] = [
     action: "start",
     label: "Start",
     desc: "Start a stopped container",
-    icon: <IconPlay width={14} height={14} />,
+    icon: <Play width={14} height={14} />,
     tone: "neutral",
     enabled: (c) => c.state !== "running",
   },
@@ -39,7 +39,7 @@ const ACTIONS: ActionDef[] = [
     action: "stop",
     label: "Stop",
     desc: "Gracefully stop (SIGTERM)",
-    icon: <IconStop width={13} height={13} />,
+    icon: <CircleOff size={14} strokeWidth={1} />,
     tone: "neutral",
     enabled: (c) => c.state === "running" || c.state === "paused",
   },
@@ -47,7 +47,7 @@ const ACTIONS: ActionDef[] = [
     action: "restart",
     label: "Restart",
     desc: "Stop then start the container",
-    icon: <IconRestart width={14} height={14} />,
+    icon: <RotateCcw size={14} strokeWidth={1} />,
     tone: "neutral",
     enabled: (c) => c.state === "running",
   },
@@ -55,7 +55,7 @@ const ACTIONS: ActionDef[] = [
     action: "pause",
     label: "Pause",
     desc: "Freeze processes (SIGSTOP)",
-    icon: <IconPause width={13} height={13} />,
+    icon: <Pause size={14} strokeWidth={1} />,
     tone: "neutral",
     enabled: (c) => c.state === "running",
   },
@@ -63,7 +63,7 @@ const ACTIONS: ActionDef[] = [
     action: "unpause",
     label: "Resume",
     desc: "Unfreeze a paused container",
-    icon: <IconPlay width={14} height={14} />,
+    icon: <Play size={14} strokeWidth={1} />,
     tone: "neutral",
     enabled: (c) => c.state === "paused",
   },
@@ -71,7 +71,7 @@ const ACTIONS: ActionDef[] = [
     action: "kill",
     label: "Kill",
     desc: "Force kill immediately (SIGKILL)",
-    icon: <IconKill width={14} height={14} />,
+    icon: <X size={14} strokeWidth={1} />,
     tone: "warn",
     destructive: true,
     enabled: (c) => c.state === "running" || c.state === "paused",
@@ -80,7 +80,7 @@ const ACTIONS: ActionDef[] = [
     action: "remove",
     label: "Remove",
     desc: "Delete the container permanently",
-    icon: <IconTrash width={13} height={13} />,
+    icon: <Trash size={14} strokeWidth={1} />,
     tone: "danger",
     destructive: true,
     enabled: () => true,
@@ -135,7 +135,9 @@ export function ActionsPanel({ container: c }: Props) {
                 {a.icon}
               </span>
               <span className="flex flex-col">
-                <span className="text-[12px] font-medium text-foreground">{a.label}</span>
+                <span className="text-[12px] font-medium text-foreground">
+                  {a.label}
+                </span>
                 <span className="text-[11px] text-muted-subtle">{a.desc}</span>
               </span>
             </button>
@@ -187,7 +189,7 @@ function ConfirmDialog({
               color: danger ? "var(--danger)" : "var(--warning)",
             }}
           >
-            <IconWarning width={18} height={18} />
+            <FileExclamationPoint size={14} strokeWidth={1} />
           </span>
           <div className="flex flex-col gap-1">
             <h3 className="text-[14px] font-semibold text-foreground">

@@ -4,12 +4,7 @@ import { cn } from "../lib/cn";
 import { TABLE_GRID } from "./tableLayout";
 import { Sparkline } from "./Sparkline";
 import { StatusDot, Badge } from "./primitives";
-import {
-  cpuColor,
-  healthTone,
-  memColor,
-  stateTone,
-} from "./status";
+import { cpuColor, healthTone, memColor, stateTone } from "./status";
 import {
   formatMb,
   formatPercent,
@@ -17,12 +12,7 @@ import {
   formatUptime,
   truncate,
 } from "../lib/format";
-import {
-  IconPlay,
-  IconRestart,
-  IconStop,
-  IconLogs,
-} from "./icons";
+import { Play, RotateCcw, CircleOff, Logs } from "lucide-react";
 import type { ContainerAction } from "../store/appContext";
 
 interface Props {
@@ -66,7 +56,11 @@ function RowImpl({
     >
       {/* Name + image hint */}
       <div className="flex min-w-0 items-center gap-2">
-        <StatusDot color={st.color} pulse={running && mode === "high"} size={7} />
+        <StatusDot
+          color={st.color}
+          pulse={running && mode === "high"}
+          size={7}
+        />
         <span className="truncate font-medium text-foreground">{c.name}</span>
       </div>
 
@@ -107,15 +101,21 @@ function RowImpl({
       {/* Memory: value + meter (+ sparkline in high mode) */}
       <div className="flex min-w-0 flex-col justify-center gap-0.5">
         <div className="flex items-center justify-between gap-2 tabular leading-none">
-          <span className="text-muted">{running ? formatMb(c.memoryUsageMb) : "—"}</span>
-          <span className="text-[10px] text-faint">{formatMb(c.memoryLimitMb)}</span>
+          <span className="text-muted">
+            {running ? formatMb(c.memoryUsageMb) : "—"}
+          </span>
+          <span className="text-[10px] text-faint">
+            {formatMb(c.memoryLimitMb)}
+          </span>
         </div>
-        <div className="h-[3px] w-full overflow-hidden rounded-full bg-surface-active">
+        <div className="h-0.75 w-full overflow-hidden rounded-full bg-surface-active">
           <div
             className="h-full rounded-full"
             style={{
               width: `${Math.min(100, memRatio * 100)}%`,
-              background: running ? memColor(c.memoryUsageMb, c.memoryLimitMb) : "var(--faint)",
+              background: running
+                ? memColor(c.memoryUsageMb, c.memoryLimitMb)
+                : "var(--faint)",
             }}
           />
         </div>
@@ -124,10 +124,12 @@ function RowImpl({
       {/* Network I/O */}
       <div className="flex flex-col justify-center tabular leading-none text-[11px]">
         <span className="text-muted">
-          <span className="text-faint">↓</span> {running ? formatRate(c.networkRxRate) : "—"}
+          <span className="text-faint">↓</span>{" "}
+          {running ? formatRate(c.networkRxRate) : "—"}
         </span>
         <span className="text-muted-subtle">
-          <span className="text-faint">↑</span> {running ? formatRate(c.networkTxRate) : "—"}
+          <span className="text-faint">↑</span>{" "}
+          {running ? formatRate(c.networkTxRate) : "—"}
         </span>
       </div>
 
@@ -139,7 +141,9 @@ function RowImpl({
           <span className="truncate font-mono text-[11px] text-muted-subtle">
             {c.ports
               .map((p) =>
-                p.publicPort ? `${p.publicPort}:${p.privatePort}` : `${p.privatePort}`,
+                p.publicPort
+                  ? `${p.publicPort}:${p.privatePort}`
+                  : `${p.privatePort}`,
               )
               .join(" ")}
           </span>
@@ -158,11 +162,16 @@ function RowImpl({
           />
         )}
         <div className="flex min-w-0 flex-col leading-none">
-          <span className="truncate font-mono text-[11px] text-muted-subtle" title={c.image}>
+          <span
+            className="truncate font-mono text-[11px] text-muted-subtle"
+            title={c.image}
+          >
             {truncate(c.image, 22)}
           </span>
           <span className="text-[10px] text-faint">
-            {running ? formatUptime(c.startedAt) : c.status.split("(")[0].trim()}
+            {running
+              ? formatUptime(c.startedAt)
+              : c.status.split("(")[0].trim()}
           </span>
         </div>
       </div>
@@ -183,7 +192,7 @@ function RowImpl({
                 onAction("restart", c);
               }}
             >
-              <IconRestart width={13} height={13} />
+              <RotateCcw size={14} strokeWidth={1} />
             </RowBtn>
             <RowBtn
               title="Stop (s)"
@@ -193,7 +202,7 @@ function RowImpl({
                 onAction("stop", c);
               }}
             >
-              <IconStop width={11} height={11} />
+              <CircleOff size={14} strokeWidth={1} />
             </RowBtn>
           </>
         ) : (
@@ -205,7 +214,7 @@ function RowImpl({
               onAction("start", c);
             }}
           >
-            <IconPlay width={11} height={11} />
+            <Play size={14} strokeWidth={1} />
           </RowBtn>
         )}
         <RowBtn
@@ -215,7 +224,7 @@ function RowImpl({
             onOpenLogs(c.id);
           }}
         >
-          <IconLogs width={13} height={13} />
+          <Logs size={14} strokeWidth={1} />
         </RowBtn>
       </div>
     </div>

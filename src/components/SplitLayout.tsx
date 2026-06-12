@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppState } from "../store/appContext";
 import { cn } from "../lib/cn";
-import { IconChevronUp } from "./icons";
+import { ChevronUp } from "lucide-react";
 
 interface Props {
   table: React.ReactNode;
@@ -88,7 +88,7 @@ export function SplitLayout({ table, detail }: Props) {
             "flex h-8 shrink-0 items-center justify-center gap-1.5 border-t border-border bg-background text-[11px] font-medium text-muted-subtle hover:bg-surface-hover hover:text-foreground",
           )}
         >
-          <IconChevronUp width={13} height={13} />
+          <ChevronUp size={14} strokeWidth={1} />
           Show detail panel
         </button>
       )}
