@@ -118,13 +118,13 @@ export function LogsPanel({ container, mode }: Props) {
   return (
     <div className="flex h-full min-h-0 flex-col">
       {/* Logs toolbar */}
-      <div className="flex h-9 shrink-0 items-center gap-2 border-b border-border bg-background px-2.5">
+      <div className="flex h-9 shrink-0 items-center gap-2 border-b border-border bg-background px-2.5 py-5">
         <button
           type="button"
           onClick={() => setPaused((p) => !p)}
           disabled={!running}
           className={cn(
-            "flex h-6 items-center gap-1 rounded border px-1.5 text-[11px] font-medium disabled:opacity-40",
+            "flex h-6 items-center gap-1 rounded-md border px-1.5 text-[11px] font-medium disabled:opacity-40",
             paused
               ? "border-warning/40 text-warning"
               : "border-border bg-surface text-muted hover:text-foreground",
@@ -146,7 +146,7 @@ export function LogsPanel({ container, mode }: Props) {
             rowVirtualizer.scrollToIndex(filtered.length - 1, { align: "end" });
           }}
           className={cn(
-            "flex h-6 items-center rounded border px-1.5 text-[11px] font-medium",
+            "flex h-6 items-center rounded-md border px-1.5 text-[11px] font-medium",
             follow
               ? "border-accent/40 text-accent"
               : "border-border bg-surface text-muted hover:text-foreground",
@@ -160,7 +160,7 @@ export function LogsPanel({ container, mode }: Props) {
         <div className="relative flex w-48 items-center">
           <ScanSearch
             size={14}
-            strokeWidth={1}
+            strokeWidth={2}
             className="pointer-events-none absolute left-2 text-faint"
           />
           <input
@@ -169,7 +169,7 @@ export function LogsPanel({ container, mode }: Props) {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Filter logs…"
             spellCheck={false}
-            className="h-6 w-full rounded border border-border bg-surface pl-7 pr-6 text-[11px] text-foreground placeholder:text-faint outline-none focus:border-border-hover"
+            className="h-6 w-full rounded-md border border-border bg-surface pl-7 pr-6 text-[11px] text-foreground placeholder:text-faint outline-none focus:border-border-hover"
           />
           {search && (
             <button
@@ -184,7 +184,7 @@ export function LogsPanel({ container, mode }: Props) {
 
         <div className="ml-auto flex items-center gap-2">
           {/* Tail limit */}
-          <div className="flex items-center gap-0.5 rounded border border-border bg-background-elevated p-0.5">
+          <div className="flex items-center gap-0.5 rounded-md border border-border bg-background-elevated p-0.5">
             {TAIL_LIMITS.map((n) => (
               <button
                 key={n}
@@ -206,7 +206,7 @@ export function LogsPanel({ container, mode }: Props) {
             type="button"
             onClick={() => setWrap((w) => !w)}
             className={cn(
-              "h-6 rounded border px-1.5 text-[11px] font-medium",
+              "h-6 rounded-md border px-1.5 text-[11px] font-medium",
               wrap
                 ? "border-accent/40 text-accent"
                 : "border-border bg-surface text-muted hover:text-foreground",
@@ -219,7 +219,7 @@ export function LogsPanel({ container, mode }: Props) {
           <button
             type="button"
             onClick={copyAll}
-            className="flex h-6 w-6 items-center justify-center rounded border border-border bg-surface text-muted hover:text-foreground"
+            className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-surface text-muted hover:text-foreground"
             title="Copy visible lines"
           >
             <Copy size={14} strokeWidth={1} />
@@ -227,7 +227,7 @@ export function LogsPanel({ container, mode }: Props) {
           <button
             type="button"
             onClick={clearView}
-            className="flex h-6 w-6 items-center justify-center rounded border border-border bg-surface text-muted hover:text-danger"
+            className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-surface text-muted hover:text-danger"
             title="Clear view"
           >
             <Trash size={14} strokeWidth={1} />
@@ -271,7 +271,7 @@ export function LogsPanel({ container, mode }: Props) {
       </div>
 
       {/* Logs status footer */}
-      <div className="flex h-6 shrink-0 items-center gap-3 border-t border-border bg-background px-2.5 text-[10px] text-faint">
+      <div className="flex h-6 shrink-0 items-center gap-3 border-t border-border bg-background py-4 px-2.5 text-[10px] text-faint">
         <span className="tabular">{filtered.length} lines</span>
         {search && (
           <span className="tabular">filtered from {lines.length}</span>

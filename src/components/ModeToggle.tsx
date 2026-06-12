@@ -28,7 +28,7 @@ export function ModeToggle() {
         {mode === "high" ? "1s" : "4s"}
       </span>
       <div
-        className="flex items-center gap-0.5 rounded-md border border-border bg-background-elevated p-0.5"
+        className="flex items-center gap-0.5 rounded-lg border border-border bg-background-elevated p-0.5"
         role="group"
         aria-label="Performance mode"
       >
@@ -38,7 +38,7 @@ export function ModeToggle() {
           aria-pressed={mode === "low"}
           title="Low mode — minimal effects, best for weak hardware"
           className={cn(
-            "flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium",
+            "cursor-pointer flex items-center gap-1 rounded-l-md px-1.5 py-0.5 text-[11px] font-medium",
             mode === "low"
               ? "bg-surface-active text-foreground"
               : "text-muted-subtle hover:text-muted",
@@ -57,7 +57,7 @@ export function ModeToggle() {
           aria-pressed={mode === "high"}
           title="High mode — richer charts and smooth animations"
           className={cn(
-            "flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium",
+            "cursor-pointer flex items-center gap-1 rounded-r-md px-1.5 py-0.5 text-[11px] font-medium",
             mode === "high"
               ? "bg-surface-active text-foreground"
               : "text-muted-subtle hover:text-muted",

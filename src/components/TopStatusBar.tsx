@@ -16,15 +16,15 @@ export function TopStatusBar() {
   const counts = useMemo(() => containerCounts(containers), [containers]);
 
   return (
-    <header className="flex h-9 shrink-0 items-center gap-3 border-b border-border bg-background-elevated px-3 text-[12px]">
+    <header className="flex h-9 shrink-0 items-center gap-3 border-b border-border bg-background-elevated px-3 text-[12px] cursor-default">
       {/* Brand */}
       <div className="flex items-center gap-2 pr-1">
         <img
           src="/favicon.svg"
           alt=""
-          width={16}
-          height={16}
-          className="h-4 w-4 shrink-0"
+          width={24}
+          height={24}
+          className="h-6 w-6 shrink-0"
           aria-hidden
         />
         <span className="font-semibold tracking-tight text-foreground">

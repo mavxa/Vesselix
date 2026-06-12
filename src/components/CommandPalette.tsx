@@ -16,17 +16,7 @@ import {
   ChartColumn,
   CircleOff,
 } from "lucide-react";
-
-interface Command {
-  id: string;
-  title: string;
-  group: string;
-  icon: React.ReactNode;
-  keywords?: string;
-  hint?: string;
-  disabled?: boolean;
-  run: () => void;
-}
+import type { Command } from "../lib/types";
 
 export function CommandPalette() {
   const { paletteOpen } = useAppState();

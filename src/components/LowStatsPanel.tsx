@@ -31,7 +31,7 @@ export function LowStatsPanel({ container: c }: Props) {
   return (
     <div className="flex h-full flex-col overflow-y-auto p-3">
       {mode === "low" && (
-        <p className="mb-3 rounded border border-border bg-surface px-2 py-1 text-[10.5px] text-faint">
+        <p className="mb-2 rounded-md border border-border bg-surface px-2 py-1 text-[10.5px] text-faint">
           Low mode — text metrics and inline sparklines only. Switch to High
           mode for time-series charts.
         </p>

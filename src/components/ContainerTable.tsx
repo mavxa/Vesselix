@@ -25,7 +25,7 @@ const HEADER_CELLS: HeaderCell[] = [
   { label: "Memory", sort: "mem" },
   { label: "Net I/O" },
   { label: "Ports" },
-  { label: "Image · Uptime" },
+  { label: "Image - Uptime" },
   { label: "" },
 ];
 

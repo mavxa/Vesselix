@@ -157,8 +157,8 @@ function RowImpl({
             data={c.cpuHistory}
             color={running ? cpuColor(c.cpuPercent) : "var(--faint)"}
             fill={mode === "high"}
-            width={44}
-            height={16}
+            width={150}
+            height={24}
           />
         )}
         <div className="flex min-w-0 flex-col leading-none">
@@ -179,53 +179,55 @@ function RowImpl({
       {/* Actions (reveal on hover/selected) */}
       <div
         className={cn(
-          "flex items-center justify-end gap-0.5 opacity-0 group-hover:opacity-100",
+          "flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100:",
           selected && "opacity-100",
         )}
       >
-        {running ? (
-          <>
+        <div className="flex gap-0.5">
+          {running ? (
+            <>
+              <RowBtn
+                title="Restart (r)"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAction("restart", c);
+                }}
+              >
+                <RotateCcw size={14} strokeWidth={2} />
+              </RowBtn>
+              <RowBtn
+                title="Stop (s)"
+                tone="danger"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAction("stop", c);
+                }}
+              >
+                <CircleOff size={14} strokeWidth={2} />
+              </RowBtn>
+            </>
+          ) : (
             <RowBtn
-              title="Restart (r)"
+              title="Start (s)"
+              tone="running"
               onClick={(e) => {
                 e.stopPropagation();
-                onAction("restart", c);
+                onAction("start", c);
               }}
             >
-              <RotateCcw size={14} strokeWidth={1} />
+              <Play size={14} strokeWidth={2} />
             </RowBtn>
-            <RowBtn
-              title="Stop (s)"
-              tone="danger"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAction("stop", c);
-              }}
-            >
-              <CircleOff size={14} strokeWidth={1} />
-            </RowBtn>
-          </>
-        ) : (
+          )}
           <RowBtn
-            title="Start (s)"
-            tone="running"
+            title="Logs (l)"
             onClick={(e) => {
               e.stopPropagation();
-              onAction("start", c);
+              onOpenLogs(c.id);
             }}
           >
-            <Play size={14} strokeWidth={1} />
+            <Logs size={14} strokeWidth={2} />
           </RowBtn>
-        )}
-        <RowBtn
-          title="Logs (l)"
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpenLogs(c.id);
-          }}
-        >
-          <Logs size={14} strokeWidth={1} />
-        </RowBtn>
+        </div>
       </div>
     </div>
   );

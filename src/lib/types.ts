@@ -2,11 +2,7 @@
 
 export type ContainerState = "running" | "exited" | "paused" | "restarting";
 
-export type ContainerHealth =
-  | "healthy"
-  | "unhealthy"
-  | "starting"
-  | "none";
+export type ContainerHealth = "healthy" | "unhealthy" | "starting" | "none";
 
 export interface PortMapping {
   privatePort: number;
@@ -93,4 +89,15 @@ export interface LogLine {
   level: LogLevel;
   stream: "stdout" | "stderr";
   text: string;
+}
+
+export interface Command {
+  id: string;
+  title: string;
+  group: string;
+  icon: React.ReactNode;
+  keywords?: string;
+  hint?: string;
+  disabled?: boolean;
+  run: () => void;
 }
