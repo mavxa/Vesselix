@@ -8,7 +8,7 @@ import {
 } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { Container, LogLine, UiPerformanceMode } from "../lib/types";
-import { generateLogBacklog, generateLogLine } from "../lib/mockLogs";
+import { getRuntimeClient } from "../runtime";
 import { formatTimestampMs } from "../lib/format";
 import { logLevelColor } from "./status";
 import { cn } from "../lib/cn";
@@ -25,6 +25,7 @@ interface Props {
 }
 
 export function LogsPanel({ container, mode }: Props) {
+  const runtime = useMemo(() => getRuntimeClient(), []);
   const [limit, setLimit] = useState<TailLimit>(500);
   const [lines, setLines] = useState<LogLine[]>([]);
   const [paused, setPaused] = useState(false);
@@ -33,46 +34,55 @@ export function LogsPanel({ container, mode }: Props) {
   const [wrap, setWrap] = useState(false);
 
   const deferredSearch = useDeferredValue(search);
-  const seqRef = useRef(0);
   const parentRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const clearAfterRef = useRef<number | null>(null);
 
   const running = container.state === "running";
 
-  // Seed backlog whenever the container changes.
+  const showLogs = useCallback((backlog: LogLine[]) => {
+    const clearAfter = clearAfterRef.current;
+    setLines(
+      clearAfter == null
+        ? backlog
+        : backlog.filter((line) => line.ts > clearAfter),
+    );
+  }, []);
+
   useEffect(() => {
-    const backlog = generateLogBacklog(container.name, limit);
-    seqRef.current = backlog.length;
-    setLines(backlog);
-    setPaused(false);
-    setFollow(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    clearAfterRef.current = null;
   }, [container.id]);
 
-  // Trim when limit shrinks.
+  // Seed backlog whenever the container or tail limit changes.
   useEffect(() => {
-    setLines((prev) =>
-      prev.length > limit ? prev.slice(prev.length - limit) : prev,
-    );
-  }, [limit]);
+    let cancelled = false;
+    runtime
+      .getLogs(container.id, limit)
+      .then((backlog) => {
+        if (!cancelled) showLogs(backlog);
+      })
+      .catch(() => {
+        if (!cancelled) setLines([]);
+      });
+    setPaused(false);
+    setFollow(true);
+    return () => {
+      cancelled = true;
+    };
+  }, [container.id, limit, runtime, showLogs]);
 
-  // Live tail. Interval depends on mode (slower in Low).
+  // Poll logs until WebSocket/SSE tailing lands. Interval is slower in Low mode.
   useEffect(() => {
     if (paused || !running) return;
-    const interval = mode === "low" ? 1400 : 700;
+    const interval = mode === "low" ? 2500 : 1200;
     const id = window.setInterval(() => {
-      setLines((prev) => {
-        const burst = 1 + Math.floor(Math.random() * (mode === "low" ? 2 : 3));
-        const next = prev.slice();
-        for (let i = 0; i < burst; i++) {
-          next.push(generateLogLine(container.name, seqRef.current++));
-        }
-        if (next.length > limit) next.splice(0, next.length - limit);
-        return next;
-      });
+      void runtime
+        .getLogs(container.id, limit)
+        .then(showLogs)
+        .catch(() => {});
     }, interval);
     return () => window.clearInterval(id);
-  }, [paused, running, mode, limit, container.name]);
+  }, [paused, running, mode, limit, container.id, runtime, showLogs]);
 
   const filtered = useMemo(() => {
     const q = deferredSearch.trim().toLowerCase();
@@ -108,8 +118,8 @@ export function LogsPanel({ container, mode }: Props) {
   }, [filtered]);
 
   const clearView = useCallback(() => {
+    clearAfterRef.current = Date.now();
     setLines([]);
-    seqRef.current = 0;
   }, []);
 
   const items = rowVirtualizer.getVirtualItems();

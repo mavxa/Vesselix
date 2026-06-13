@@ -5,9 +5,9 @@ import type {
   DetailTab,
   SortDir,
   SortKey,
+  HostInfo,
   UiPerformanceMode,
 } from "../lib/types";
-import type { MOCK_HOST } from "../lib/mockData";
 
 export type ToastKind = "info" | "success" | "warn" | "error";
 export interface Toast {
@@ -28,7 +28,7 @@ export type ContainerAction =
 export interface AppState {
   // data
   containers: Container[];
-  host: typeof MOCK_HOST;
+  host: HostInfo;
 
   // ui mode
   mode: UiPerformanceMode;
@@ -69,7 +69,7 @@ export interface AppState {
   pushToast: (kind: ToastKind, text: string) => void;
   dismissToast: (id: number) => void;
 
-  // mock actions
+  // container actions (mock runtime or real backend runtime)
   runAction: (action: ContainerAction, container: Container) => void;
 }
 

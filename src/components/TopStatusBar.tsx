@@ -14,6 +14,11 @@ function Sep() {
 export function TopStatusBar() {
   const { host, containers } = useAppState();
   const counts = useMemo(() => containerCounts(containers), [containers]);
+  const osLabel = host.os.trim();
+  const dockerMetaLabel =
+    osLabel && !["unknown", "linux"].includes(osLabel.toLowerCase())
+      ? osLabel
+      : `v${host.engineVersion}`;
 
   return (
     <header className="flex h-9 shrink-0 items-center gap-3 border-b border-border bg-background-elevated px-3 text-[12px] cursor-default">
@@ -37,9 +42,7 @@ export function TopStatusBar() {
       {/* Host */}
       <span className="text-muted-subtle">
         <span className="text-muted">{host.hostname}</span>
-        <span className="ml-1 text-faint">
-          {host.os.split(" ")[0]} · {host.arch}
-        </span>
+        <span className="ml-1 text-faint">{host.arch}</span>
       </span>
 
       <Sep />
@@ -53,8 +56,12 @@ export function TopStatusBar() {
         <span className="text-muted">
           {host.dockerConnected ? "Docker connected" : "Disconnected"}
         </span>
-        <span className="flex items-center gap-1 text-faint">
-          <IconPlug width={11} height={11} />v{host.engineVersion}
+        <span
+          className="flex items-center gap-1 text-faint"
+          title={`Docker Engine v${host.engineVersion}`}
+        >
+          <IconPlug width={11} height={11} />
+          {dockerMetaLabel}
         </span>
       </span>
 

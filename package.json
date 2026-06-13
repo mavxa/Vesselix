@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:backend": "cargo run --manifest-path backend/Cargo.toml",
     "build": "tsc -b && vite build",
+    "check:backend": "cargo check --manifest-path backend/Cargo.toml",
     "lint": "eslint .",
     "preview": "vite preview"
   },

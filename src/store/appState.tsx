@@ -1,18 +1,15 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   Container,
   ContainerFilter,
   DetailTab,
+  HostInfo,
   SortDir,
   SortKey,
   UiPerformanceMode,
 } from "../lib/types";
-import {
-  createMockContainers,
-  MOCK_HOST,
-  tickContainers,
-  tickHost,
-} from "../lib/mockData";
+import { getRuntimeClient } from "../runtime";
 import {
   AppStateContext,
   type AppState,
@@ -23,16 +20,37 @@ import {
 
 let toastSeq = 0;
 
+const EMPTY_HOST: HostInfo = {
+  hostname: "connecting",
+  dockerConnected: false,
+  engineVersion: "unknown",
+  apiVersion: "unknown",
+  os: "unknown",
+  arch: "unknown",
+  cpuPercent: 0,
+  cpuCores: 0,
+  memUsedMb: 0,
+  memTotalMb: 0,
+};
+
+const EMPTY_CONTAINERS: Container[] = [];
+
+const actionVerb: Record<ContainerAction, string> = {
+  start: "Started",
+  stop: "Stopped",
+  restart: "Restarted",
+  kill: "Killed",
+  pause: "Paused",
+  unpause: "Resumed",
+  remove: "Removed",
+};
+
 export function AppStateProvider({ children }: { children: ReactNode }) {
-  const [containers, setContainers] = useState<Container[]>(() =>
-    createMockContainers(),
-  );
-  const [host, setHost] = useState(MOCK_HOST);
+  const queryClient = useQueryClient();
+  const runtime = useMemo(() => getRuntimeClient(), []);
 
   const [mode, setMode] = useState<UiPerformanceMode>("low");
-  const [selectedId, setSelectedId] = useState<string | null>(
-    () => createMockContainers()[2]?.id ?? null,
-  );
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detailTab, setDetailTab] = useState<DetailTab>("logs");
   const [detailOpen, setDetailOpen] = useState(true);
 
@@ -44,6 +62,23 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
   const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const refetchInterval = mode === "high" ? 1000 : 4000;
+
+  const containersQuery = useQuery({
+    queryKey: ["runtime", runtime.mode, "containers"],
+    queryFn: runtime.listContainers,
+    refetchInterval,
+  });
+
+  const hostQuery = useQuery({
+    queryKey: ["runtime", runtime.mode, "host"],
+    queryFn: runtime.getHost,
+    refetchInterval,
+  });
+
+  const containers = containersQuery.data ?? EMPTY_CONTAINERS;
+  const host = hostQuery.data ?? EMPTY_HOST;
 
   const dismissToast = useCallback((id: number) => {
     setToasts((t) => t.filter((x) => x.id !== id));
@@ -58,23 +93,28 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     [dismissToast],
   );
 
-  const toggleMode = useCallback(() => {
-    setMode((m) => {
-      const next = m === "low" ? "high" : "low";
-      return next;
-    });
-  }, []);
+  const actionMutation = useMutation({
+    mutationFn: ({ action, container }: { action: ContainerAction; container: Container }) =>
+      runtime.runAction(action, container),
+    onSuccess: (_data, { action, container }) => {
+      void queryClient.invalidateQueries({ queryKey: ["runtime", runtime.mode, "containers"] });
+      void queryClient.invalidateQueries({ queryKey: ["runtime", runtime.mode, "host"] });
+      if (action === "remove") {
+        setSelectedId((cur) => (cur === container.id ? null : cur));
+      }
+      pushToast(
+        action === "kill" || action === "remove" ? "warn" : "success",
+        `${actionVerb[action]} ${container.name}`,
+      );
+    },
+    onError: (error, { action, container }) => {
+      pushToast("error", `Failed to ${action} ${container.name}: ${String(error)}`);
+    },
+  });
 
-  // Live stats simulation. High mode updates ~1s for a lively feel;
-  // Low mode updates every ~4s to mimic cheaper polling on weak hardware.
-  useEffect(() => {
-    const interval = mode === "high" ? 1000 : 4000;
-    const id = window.setInterval(() => {
-      setContainers((prev) => tickContainers(prev));
-      setHost((h) => tickHost(h));
-    }, interval);
-    return () => window.clearInterval(id);
-  }, [mode]);
+  const toggleMode = useCallback(() => {
+    setMode((m) => (m === "low" ? "high" : "low"));
+  }, []);
 
   const select = useCallback((id: string | null) => {
     setSelectedId(id);
@@ -94,59 +134,14 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
   const refresh = useCallback(() => {
     setRefreshTick((t) => t + 1);
-  }, []);
+    void queryClient.invalidateQueries({ queryKey: ["runtime", runtime.mode] });
+  }, [queryClient, runtime.mode]);
 
   const runAction = useCallback(
     (action: ContainerAction, container: Container) => {
-      setContainers((prev) =>
-        prev.map((c) => {
-          if (c.id !== container.id) return c;
-          switch (action) {
-            case "start":
-              return { ...c, state: "running", status: "Up 1 second", health: "starting" };
-            case "stop":
-            case "kill":
-              return {
-                ...c,
-                state: "exited",
-                status: action === "kill" ? "Exited (137) 1 second ago" : "Exited (0) 1 second ago",
-                health: "none",
-                cpuPercent: 0,
-                networkRxRate: 0,
-                networkTxRate: 0,
-              };
-            case "restart":
-              return { ...c, state: "running", status: "Up 1 second", health: "starting", startedAt: Date.now() };
-            case "pause":
-              return { ...c, state: "paused", status: c.status + " (Paused)", cpuPercent: 0 };
-            case "unpause":
-              return { ...c, state: "running", status: c.status.replace(" (Paused)", "") };
-            default:
-              return c;
-          }
-        }),
-      );
-
-      if (action === "remove") {
-        setContainers((prev) => prev.filter((c) => c.id !== container.id));
-        setSelectedId((cur) => (cur === container.id ? null : cur));
-      }
-
-      const verb: Record<ContainerAction, string> = {
-        start: "Started",
-        stop: "Stopped",
-        restart: "Restarted",
-        kill: "Killed",
-        pause: "Paused",
-        unpause: "Resumed",
-        remove: "Removed",
-      };
-      pushToast(
-        action === "kill" || action === "remove" ? "warn" : "success",
-        `${verb[action]} ${container.name}`,
-      );
+      actionMutation.mutate({ action, container });
     },
-    [pushToast],
+    [actionMutation],
   );
 
   const visibleContainers = useMemo(() => {
@@ -190,9 +185,10 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   }, [containers, query, filter, sortKey, sortDir]);
 
   const selectedContainer = useMemo(
-    () => containers.find((c) => c.id === selectedId) ?? null,
+    () => containers.find((c) => c.id === selectedId) ?? containers[0] ?? null,
     [containers, selectedId],
   );
+  const effectiveSelectedId = selectedContainer?.id ?? null;
 
   const value = useMemo<AppState>(
     () => ({
@@ -201,7 +197,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       mode,
       setMode,
       toggleMode,
-      selectedId,
+      selectedId: effectiveSelectedId,
       select,
       selectedContainer,
       detailTab,
@@ -230,7 +226,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       host,
       mode,
       toggleMode,
-      selectedId,
+      effectiveSelectedId,
       select,
       selectedContainer,
       detailTab,
