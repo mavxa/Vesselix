@@ -1,17 +1,22 @@
 {
-  "name": "bun",
+  "name": "vesselix",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:backend": "cargo run --manifest-path backend/Cargo.toml",
     "build": "tsc -b && vite build",
+    "check:backend": "cargo check --manifest-path backend/Cargo.toml",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",
+    "@tanstack/react-hotkeys": "^0.10.0",
     "@tanstack/react-query": "^5.101.0",
+    "@tanstack/react-virtual": "^3.14.2",
+    "lucide-react": "^1.3.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "tailwindcss": "^4.3.0"

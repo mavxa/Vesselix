@@ -1,8 +1,7 @@
-// import { useState } from "react";
-import "./App.css";
+import { MainScreen } from "./features/main/MainScreen";
 
 function App() {
-  return <></>;
+  return <MainScreen />;
 }
 
 export default App;
