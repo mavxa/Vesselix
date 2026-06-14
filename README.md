@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+# Vesselix
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Lightweight local-first Docker dashboard: `docker ps` + `docker logs` + `docker stats` + command palette.
 
-Currently, two official plugins are available:
+Vesselix is designed as a compact system tool, not a PaaS/admin suite. It runs locally, talks to the Docker socket, and serves the UI from a single binary.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+vesselix
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Default address:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```text
+http://127.0.0.1:4747
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Custom port:
+
+```bash
+vesselix -p 33557
+```
+
+Listen on all interfaces:
+
+```bash
+vesselix --host 0.0.0.0 --port 4747
+```
+
+Environment overrides:
+
+```bash
+VESSELIX_HOST=127.0.0.1 VESSELIX_PORT=4747 vesselix
+```
+
+## Development
+
+Run the Rust backend/API:
+
+```bash
+bun run dev:backend
+```
+
+Run the Vite frontend:
+
+```bash
+bun run dev
+```
+
+Checks:
+
+```bash
+bun run lint
+bun run build
+cargo check --manifest-path backend/Cargo.toml
+```
+
+## Packages
+
+Release archives contain one executable with the frontend embedded.
+
+Planned Arch packages:
+
+```text
+vesselix-bin
+vesselix-git
+```
+
+The package installs a systemd unit but does not enable it automatically:
+
+```bash
+sudo systemctl enable --now vesselix.service
 ```

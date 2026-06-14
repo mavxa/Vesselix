@@ -1,15 +1,15 @@
 use std::{
     collections::HashMap,
     fs,
-    net::SocketAddr,
+    net::{IpAddr, Ipv4Addr, SocketAddr},
     time::{SystemTime, UNIX_EPOCH},
 };
-use tokio;
 
 use axum::{
     Json, Router,
+    body::Body,
     extract::{Path, Query, State},
-    http::StatusCode,
+    http::{StatusCode, Uri, header},
     response::{IntoResponse, Response},
     routing::{get, post},
 };
@@ -23,7 +23,9 @@ use bollard::{
     errors::Error as DockerError,
     models::{ContainerSummary, Port},
 };
+use clap::Parser;
 use futures_util::StreamExt;
+use include_dir::{Dir, include_dir};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
@@ -34,8 +36,29 @@ struct AppState {
     docker: Docker,
 }
 
+static FRONTEND_DIST: Dir<'_> = include_dir!("$OUT_DIR/frontend");
+
+#[derive(Debug, Parser)]
+#[command(
+    name = "vesselix",
+    version,
+    about = "Lightweight local-first Docker dashboard"
+)]
+struct Cli {
+    #[arg(short = 'H', long, env = "VESSELIX_HOST", default_value_t = IpAddr::V4(Ipv4Addr::LOCALHOST))]
+    host: IpAddr,
+
+    #[arg(short, long, env = "VESSELIX_PORT", default_value_t = 4747)]
+    port: u16,
+
+    #[arg(long, env = "VESSELIX_BACKEND_ADDR", hide = true)]
+    addr: Option<SocketAddr>,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
+    let cli = Cli::parse();
+
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()))
         .init();
@@ -52,16 +75,16 @@ async fn main() -> Result<(), AppError> {
             "/api/containers/{id}/actions/{action}",
             post(container_action),
         )
+        .fallback(static_asset)
         .layer(CorsLayer::permissive())
         .layer(TraceLayer::new_for_http())
         .with_state(state);
 
-    let addr: SocketAddr = std::env::var("VESSELIX_BACKEND_ADDR")
-        .unwrap_or_else(|_| "127.0.0.1:8787".to_string())
-        .parse()
-        .expect("valid VESSELIX_BACKEND_ADDR");
+    let addr = cli
+        .addr
+        .unwrap_or_else(|| SocketAddr::new(cli.host, cli.port));
 
-    tracing::info!(%addr, "starting Vesselix backend");
+    tracing::info!(%addr, url = %format!("http://{addr}"), "starting Vesselix");
     let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
@@ -72,6 +95,29 @@ async fn main() -> Result<(), AppError> {
 
 async fn shutdown_signal() {
     let _ = tokio::signal::ctrl_c().await;
+}
+
+async fn static_asset(uri: Uri) -> Response {
+    let requested = uri.path().trim_start_matches('/');
+    let path = if requested.is_empty() {
+        "index.html"
+    } else {
+        requested
+    };
+
+    let Some(file) = FRONTEND_DIST
+        .get_file(path)
+        .or_else(|| FRONTEND_DIST.get_file("index.html"))
+    else {
+        return (StatusCode::NOT_FOUND, "not found").into_response();
+    };
+
+    let mime = mime_guess::from_path(file.path()).first_or_octet_stream();
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, mime.as_ref())
+        .body(Body::from(file.contents().to_vec()))
+        .unwrap_or_else(|_| StatusCode::INTERNAL_SERVER_ERROR.into_response())
 }
 
 async fn health() -> Json<HealthResponse> {

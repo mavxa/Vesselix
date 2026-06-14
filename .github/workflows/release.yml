@@ -1,0 +1,130 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    name: Linux ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            target: x86_64-unknown-linux-gnu
+            builder: cargo
+          - arch: aarch64
+            target: aarch64-unknown-linux-gnu
+            builder: cross
+          - arch: armv7h
+            target: armv7-unknown-linux-gnueabihf
+            builder: cross
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross
+        if: matrix.builder == 'cross'
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cross
+
+      - name: Install frontend dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build frontend
+        run: bun run build
+
+      - name: Build vesselix
+        if: matrix.builder == 'cargo'
+        run: cargo build --release --manifest-path backend/Cargo.toml --target ${{ matrix.target }}
+
+      - name: Cross-build vesselix
+        if: matrix.builder == 'cross'
+        run: cross build --release --manifest-path backend/Cargo.toml --target ${{ matrix.target }}
+
+      - name: Package artifact
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME:-dev}"
+          name="vesselix-${version}-linux-${{ matrix.arch }}"
+          mkdir -p "target/package/${name}"
+          install -Dm755 "backend/target/${{ matrix.target }}/release/vesselix" "target/package/${name}/vesselix"
+          install -Dm644 README.md "target/package/${name}/README.md"
+          tar -czf "target/package/${name}.tar.gz" -C "target/package/${name}" .
+          sha256sum "target/package/${name}.tar.gz" > "target/package/${name}.tar.gz.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vesselix-linux-${{ matrix.arch }}
+          path: |
+            target/package/*.tar.gz
+            target/package/*.sha256
+
+  windows:
+    name: Windows x86_64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Install frontend dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build frontend
+        run: bun run build
+
+      - name: Build vesselix
+        run: cargo build --release --manifest-path backend/Cargo.toml --target x86_64-pc-windows-msvc
+
+      - name: Package artifact
+        shell: pwsh
+        run: |
+          $version = if ($env:GITHUB_REF_NAME) { $env:GITHUB_REF_NAME } else { "dev" }
+          $name = "vesselix-$version-windows-x86_64"
+          New-Item -ItemType Directory -Force -Path "target/package/$name" | Out-Null
+          Copy-Item "backend/target/x86_64-pc-windows-msvc/release/vesselix.exe" "target/package/$name/vesselix.exe"
+          Copy-Item "README.md" "target/package/$name/README.md"
+          Compress-Archive -Path "target/package/$name/*" -DestinationPath "target/package/$name.zip" -Force
+          $hash = (Get-FileHash "target/package/$name.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $name.zip" | Set-Content "target/package/$name.zip.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vesselix-windows-x86_64
+          path: |
+            target/package/*.zip
+            target/package/*.sha256
+
+  publish:
+    name: Publish GitHub release
+    needs: [linux, windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release-artifacts/*
