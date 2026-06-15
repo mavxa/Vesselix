@@ -2,6 +2,7 @@ use std::{
     collections::HashMap,
     fs,
     net::{IpAddr, Ipv4Addr, SocketAddr},
+    sync::{Arc, Mutex},
     time::{SystemTime, UNIX_EPOCH},
 };
 
@@ -27,6 +28,7 @@ use clap::Parser;
 use futures_util::StreamExt;
 use include_dir::{Dir, include_dir};
 use serde::{Deserialize, Serialize};
+use sysinfo::System;
 use thiserror::Error;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 use tracing_subscriber::EnvFilter;
@@ -34,6 +36,14 @@ use tracing_subscriber::EnvFilter;
 #[derive(Clone)]
 struct AppState {
     docker: Docker,
+    system: Arc<Mutex<System>>,
+}
+
+struct HostMetrics {
+    cpu_percent: f64,
+    cpu_cores: u64,
+    mem_used_mb: f64,
+    mem_total_mb: f64,
 }
 
 static FRONTEND_DIST: Dir<'_> = include_dir!("$OUT_DIR/frontend");
@@ -64,7 +74,13 @@ async fn main() -> Result<(), AppError> {
         .init();
 
     let docker = Docker::connect_with_local_defaults()?;
-    let state = AppState { docker };
+    let mut system = System::new_all();
+    system.refresh_cpu_usage();
+    system.refresh_memory();
+    let state = AppState {
+        docker,
+        system: Arc::new(Mutex::new(system)),
+    };
 
     let app = Router::new()
         .route("/api/health", get(health))
@@ -127,6 +143,7 @@ async fn health() -> Json<HealthResponse> {
 async fn host(State(state): State<AppState>) -> Result<Json<HostInfo>, AppError> {
     let version = state.docker.version().await?;
     let info = state.docker.info().await?;
+    let metrics = read_host_metrics(&state);
     let os = read_os_pretty_name()
         .or(version.os)
         .unwrap_or_else(|| "unknown".to_string());
@@ -138,10 +155,18 @@ async fn host(State(state): State<AppState>) -> Result<Json<HostInfo>, AppError>
         api_version: version.api_version.unwrap_or_else(|| "unknown".to_string()),
         os,
         arch: version.arch.unwrap_or_else(|| "unknown".to_string()),
-        cpu_percent: 0.0,
-        cpu_cores: info.ncpu.unwrap_or_default() as u64,
-        mem_used_mb: 0.0,
-        mem_total_mb: info.mem_total.unwrap_or_default() as f64 / 1024.0 / 1024.0,
+        cpu_percent: metrics.cpu_percent,
+        cpu_cores: if metrics.cpu_cores > 0 {
+            metrics.cpu_cores
+        } else {
+            info.ncpu.unwrap_or_default() as u64
+        },
+        mem_used_mb: metrics.mem_used_mb,
+        mem_total_mb: if metrics.mem_total_mb > 0.0 {
+            metrics.mem_total_mb
+        } else {
+            info.mem_total.unwrap_or_default() as f64 / 1024.0 / 1024.0
+        },
     }))
 }
 
@@ -497,6 +522,27 @@ fn now_millis() -> u64 {
         .duration_since(UNIX_EPOCH)
         .map(|duration| duration.as_millis() as u64)
         .unwrap_or_default()
+}
+
+fn read_host_metrics(state: &AppState) -> HostMetrics {
+    let Some(mut system) = state.system.lock().ok() else {
+        return HostMetrics {
+            cpu_percent: 0.0,
+            cpu_cores: 0,
+            mem_used_mb: 0.0,
+            mem_total_mb: 0.0,
+        };
+    };
+
+    system.refresh_cpu_usage();
+    system.refresh_memory();
+
+    HostMetrics {
+        cpu_percent: system.global_cpu_usage() as f64,
+        cpu_cores: system.cpus().len() as u64,
+        mem_used_mb: system.used_memory() as f64 / 1024.0 / 1024.0,
+        mem_total_mb: system.total_memory() as f64 / 1024.0 / 1024.0,
+    }
 }
 
 fn read_os_pretty_name() -> Option<String> {
