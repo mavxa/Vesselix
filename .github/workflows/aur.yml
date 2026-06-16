@@ -26,11 +26,11 @@ jobs:
           - pkgname: vesselix-git
             pkgbuild: packaging/aur/vesselix-git/PKGBUILD
             assets: packaging/aur/vesselix-git/vesselix.service
-    if: github.event.inputs.package == 'both' || github.event.inputs.package == matrix.pkgname
     steps:
       - uses: actions/checkout@v4
 
       - name: Publish ${{ matrix.pkgname }} to AUR
+        if: github.event.inputs.package == 'both' || github.event.inputs.package == matrix.pkgname
         uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
         with:
           pkgname: ${{ matrix.pkgname }}
