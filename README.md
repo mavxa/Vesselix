@@ -4,6 +4,26 @@ Lightweight local-first Docker dashboard: `docker ps` + `docker logs` + `docker 
 
 Vesselix is designed as a compact system tool, not a PaaS/admin suite. It runs locally, talks to the Docker socket, and serves the UI from a single binary.
 
+## Install
+
+Generic Linux install from GitHub Releases:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mavxa/Vesselix/main/install.sh | sh
+```
+
+Install a specific version:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mavxa/Vesselix/main/install.sh | VERSION=v0.1.0 sh
+```
+
+Install without sudo into a user directory:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mavxa/Vesselix/main/install.sh | INSTALL_DIR="$HOME/.local/bin" sh
+```
+
 ## Run
 
 ```bash
