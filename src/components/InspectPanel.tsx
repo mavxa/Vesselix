@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Container } from "../lib/types";
 import { formatAge, formatUptime, shortId } from "../lib/format";
 import { cn } from "../lib/cn";
@@ -7,6 +8,9 @@ interface Props {
 }
 
 export function InspectPanel({ container: c }: Props) {
+  const [revealedEnvId, setRevealedEnvId] = useState<string | null>(null);
+  const envRevealed = revealedEnvId === c.id;
+
   return (
     <div className="h-full overflow-y-auto p-3 text-[12px]">
       <Group title="General">
@@ -95,7 +99,29 @@ export function InspectPanel({ container: c }: Props) {
       </Group>
 
       <Group title={`Environment (${c.env.length})`}>
-        <div className="col-span-2 flex flex-col gap-0.5 blur hover:blur-none">
+        <div
+          className={cn(
+            "col-span-2 flex flex-col gap-0.5 rounded-sm outline-none",
+            !envRevealed && "cursor-pointer blur-sm select-none",
+          )}
+          role="button"
+          tabIndex={0}
+          aria-label={envRevealed ? "Environment variables" : "Reveal environment variables"}
+          title={envRevealed ? "Environment variables" : "Click to reveal environment variables"}
+          onClick={(event) => {
+            event.currentTarget.focus();
+            setRevealedEnvId(c.id);
+          }}
+          onFocus={() => setRevealedEnvId(c.id)}
+          onBlur={() => setRevealedEnvId(null)}
+          onMouseLeave={() => setRevealedEnvId(null)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setRevealedEnvId(c.id);
+            }
+          }}
+        >
           {c.env.map((e, i) => {
             const eq = e.indexOf("=");
             const key = eq >= 0 ? e.slice(0, eq) : e;
