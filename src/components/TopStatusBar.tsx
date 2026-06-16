@@ -4,6 +4,7 @@ import { containerCounts } from "./status";
 import { formatMb, formatPercent } from "../lib/format";
 import { StatusDot } from "./primitives";
 import { ModeToggle } from "./ModeToggle";
+import { ThemeToggle } from "./ThemeToggle";
 import { cpuColor, memColor } from "./status";
 import { Plug as IconPlug } from "lucide-react";
 
@@ -102,6 +103,8 @@ export function TopStatusBar() {
           value={`${formatMb(host.memUsedMb)} / ${formatMb(host.memTotalMb)}`}
           color={memColor(host.memUsedMb, host.memTotalMb)}
         />
+        <Sep />
+        <ThemeToggle />
         <Sep />
         <ModeToggle />
       </div>

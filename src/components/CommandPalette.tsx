@@ -224,7 +224,7 @@ function PaletteInner() {
       >
         {/* Input */}
         <div className="flex items-center gap-2 border-b border-border px-3">
-          <ScanSearch size={40} strokeWidth={1} className="text-faint" />
+          <ScanSearch size={28} strokeWidth={1} className="text-faint" />
           <input
             ref={inputRef}
             value={query}

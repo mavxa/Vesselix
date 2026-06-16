@@ -64,6 +64,7 @@ jobs:
           mkdir -p "target/package/${name}"
           install -Dm755 "backend/target/${{ matrix.target }}/release/vesselix" "target/package/${name}/vesselix"
           install -Dm644 README.md "target/package/${name}/README.md"
+          install -Dm644 LICENSE "target/package/${name}/LICENSE"
           tar -czf "target/package/${name}.tar.gz" -C "target/package/${name}" .
           sha256sum "target/package/${name}.tar.gz" > "target/package/${name}.tar.gz.sha256"
 
@@ -103,6 +104,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path "target/package/$name" | Out-Null
           Copy-Item "backend/target/x86_64-pc-windows-msvc/release/vesselix.exe" "target/package/$name/vesselix.exe"
           Copy-Item "README.md" "target/package/$name/README.md"
+          Copy-Item "LICENSE" "target/package/$name/LICENSE"
           Compress-Archive -Path "target/package/$name/*" -DestinationPath "target/package/$name.zip" -Force
           $hash = (Get-FileHash "target/package/$name.zip" -Algorithm SHA256).Hash.ToLower()
           "$hash  $name.zip" | Set-Content "target/package/$name.zip.sha256"

@@ -48,6 +48,12 @@ struct HostMetrics {
 
 static FRONTEND_DIST: Dir<'_> = include_dir!("$OUT_DIR/frontend");
 
+const VESSELIX_LOGO: &str = r#"__________
+___   ____________________________  /__(_)___  __
+__ | / /  _ \_  ___/_  ___/  _ \_  /__  /__  |/_/
+__ |/ //  __/(__  )_(__  )/  __/  / _  / __>  <
+_____/ \___//____/ /____/ \___//_/  /_/  /_/|_|"#;
+
 #[derive(Debug, Parser)]
 #[command(
     name = "vesselix",
@@ -100,6 +106,7 @@ async fn main() -> Result<(), AppError> {
         .addr
         .unwrap_or_else(|| SocketAddr::new(cli.host, cli.port));
 
+    print_startup_banner(addr);
     tracing::info!(%addr, url = %format!("http://{addr}"), "starting Vesselix");
     let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(listener, app)
@@ -111,6 +118,24 @@ async fn main() -> Result<(), AppError> {
 
 async fn shutdown_signal() {
     let _ = tokio::signal::ctrl_c().await;
+}
+
+fn print_startup_banner(addr: SocketAddr) {
+    let url = format!("http://{addr}");
+    let description = "local-first Docker dashboard";
+    let width = description.len().max(url.len()).max(" Vesselix ".len());
+    let rule_width = width + 2;
+    let title_rule = "-- Vesselix ";
+
+    println!("{VESSELIX_LOGO}");
+    println!("");
+    println!(
+        "+{title_rule}{}+",
+        "-".repeat(rule_width - title_rule.len())
+    );
+    println!("| {description:<width$} |");
+    println!("| {url:<width$} |");
+    println!("+{}+", "-".repeat(rule_width));
 }
 
 async fn static_asset(uri: Uri) -> Response {

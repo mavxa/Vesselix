@@ -32,4 +32,5 @@ package() {
   install -Dm755 "backend/target/release/vesselix" "${pkgdir}/usr/bin/vesselix"
   install -Dm644 "${srcdir}/vesselix.service" "${pkgdir}/usr/lib/systemd/system/vesselix.service"
   install -Dm644 "README.md" "${pkgdir}/usr/share/doc/vesselix/README.md"
+  install -Dm644 "LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
