@@ -1,0 +1,8 @@
+.git
+.github
+backend/target
+dist
+node_modules
+packaging/aur/vesselix-bin/*.tar.gz
+packaging/aur/vesselix-git/Vesselix
+target
