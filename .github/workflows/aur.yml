@@ -12,6 +12,10 @@ on:
           - both
           - vesselix-bin
           - vesselix-git
+      release:
+        description: GitHub release tag/version for vesselix-bin, for example v0.1.1
+        required: true
+        default: v0.1.0
 
 jobs:
   publish:
@@ -28,6 +32,10 @@ jobs:
             assets: packaging/aur/vesselix-git/vesselix.service
     steps:
       - uses: actions/checkout@v4
+
+      - name: Update vesselix-bin release metadata
+        if: (github.event.inputs.package == 'both' || github.event.inputs.package == matrix.pkgname) && matrix.pkgname == 'vesselix-bin'
+        run: ./scripts/update-aur-bin.sh "${{ github.event.inputs.release }}"
 
       - name: Publish ${{ matrix.pkgname }} to AUR
         if: github.event.inputs.package == 'both' || github.event.inputs.package == matrix.pkgname
