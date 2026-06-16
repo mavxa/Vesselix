@@ -4,9 +4,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "./index.css";
 import App from "./App.tsx";
+import { applyTheme, readStoredTheme } from "./lib/theme";
 
 // Dark-first: set theme before paint.
-document.documentElement.dataset.theme = "dark";
+applyTheme(readStoredTheme());
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   Container,
@@ -8,7 +8,9 @@ import type {
   SortDir,
   SortKey,
   UiPerformanceMode,
+  UiTheme,
 } from "../lib/types";
+import { applyTheme, persistTheme, readStoredTheme } from "../lib/theme";
 import { getRuntimeClient } from "../runtime";
 import {
   AppStateContext,
@@ -50,6 +52,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const runtime = useMemo(() => getRuntimeClient(), []);
 
   const [mode, setMode] = useState<UiPerformanceMode>("low");
+  const [theme, setTheme] = useState<UiTheme>(() => readStoredTheme());
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detailTab, setDetailTab] = useState<DetailTab>("logs");
   const [detailOpen, setDetailOpen] = useState(true);
@@ -114,6 +117,15 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
   const toggleMode = useCallback(() => {
     setMode((m) => (m === "low" ? "high" : "low"));
+  }, []);
+
+  useEffect(() => {
+    applyTheme(theme);
+    persistTheme(theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((current) => (current === "dark" ? "light" : "dark"));
   }, []);
 
   const select = useCallback((id: string | null) => {
@@ -197,6 +209,9 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       mode,
       setMode,
       toggleMode,
+      theme,
+      setTheme,
+      toggleTheme,
       selectedId: effectiveSelectedId,
       select,
       selectedContainer,
@@ -226,6 +241,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       host,
       mode,
       toggleMode,
+      theme,
+      toggleTheme,
       effectiveSelectedId,
       select,
       selectedContainer,

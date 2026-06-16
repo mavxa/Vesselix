@@ -73,7 +73,7 @@ export function ContainerTable() {
             <div
               key={i}
               className={cn(
-                "flex items-center",
+                "flex items-center cursor-default",
                 h.align === "right" && "justify-end",
               )}
             >

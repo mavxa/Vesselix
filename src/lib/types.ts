@@ -61,6 +61,8 @@ export interface Container {
 
 export type UiPerformanceMode = "low" | "high";
 
+export type UiTheme = "dark" | "light";
+
 export type ContainerFilter = "all" | "running" | "stopped" | "unhealthy";
 
 export type SortKey = "name" | "state" | "cpu" | "mem";

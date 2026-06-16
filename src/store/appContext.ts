@@ -7,6 +7,7 @@ import type {
   SortKey,
   HostInfo,
   UiPerformanceMode,
+  UiTheme,
 } from "../lib/types";
 
 export type ToastKind = "info" | "success" | "warn" | "error";
@@ -34,6 +35,11 @@ export interface AppState {
   mode: UiPerformanceMode;
   setMode: (m: UiPerformanceMode) => void;
   toggleMode: () => void;
+
+  // color theme
+  theme: UiTheme;
+  setTheme: (theme: UiTheme) => void;
+  toggleTheme: () => void;
 
   // selection
   selectedId: string | null;

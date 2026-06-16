@@ -95,7 +95,7 @@ export function InspectPanel({ container: c }: Props) {
       </Group>
 
       <Group title={`Environment (${c.env.length})`}>
-        <div className="col-span-2 flex flex-col gap-0.5">
+        <div className="col-span-2 flex flex-col gap-0.5 blur hover:blur-none">
           {c.env.map((e, i) => {
             const eq = e.indexOf("=");
             const key = eq >= 0 ? e.slice(0, eq) : e;
